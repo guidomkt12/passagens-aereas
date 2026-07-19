@@ -8,7 +8,7 @@ import { useState } from 'react';
 const initial: SearchInput = { origin: 'GRU', destination: 'LIS', departureDate: '', adults: 1, cabin: 'economy', stops: 'any', mode: 'cash', currency: 'BRL', gl: 'br', hl: 'pt' };
 type ConnectorStatus = { seatsAeroEnabled: boolean };
 
-function errorMessage(error: unknown) { const status = (error as { status?: number }).status; if (status === 503) return 'Conector indisponível.'; if (status === 502) return 'Falha na fonte de dados.'; if (status === 401) return 'Sua sessão expirou. Entre novamente.'; return error instanceof Error ? error.message : 'Não foi possível concluir a busca.'; }
+function errorMessage(error: unknown) { const status = (error as { status?: number }).status; const upstreamMessage = error instanceof Error ? error.message : ''; if (status === 503) return upstreamMessage || 'Conector indisponível. Verifique a configuração do conector.'; if (status === 502) return upstreamMessage || 'Falha na fonte de dados.'; if (status === 401) return 'Sua sessão expirou. Entre novamente.'; return upstreamMessage || 'Não foi possível concluir a busca.'; }
 
 export default function Buscar() {
   const [form, setForm] = useState<SearchInput>(initial);
