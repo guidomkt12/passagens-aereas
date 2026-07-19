@@ -1,0 +1,1 @@
+import { Nav } from '@/components/nav'; export default function Radares(){return <main className="shell"><Nav/><h1>Radares salvos</h1><article className="card"><h2>Crie um radar</h2><p className="muted">Defina rota, preço, desconto, cabine e teto de pontos. O n8n agenda as verificações e persiste o histórico.</p><button className="btn">Novo radar</button></article></main>}
