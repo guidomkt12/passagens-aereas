@@ -1,0 +1,4 @@
+import type { SearchInput } from './schemas';
+export const storageKeys={search:'flight:last-search',cash:'flight:last-cash-result',award:'flight:last-award-result',errors:'flight:last-errors'};
+export async function postFlight(path:string, payload:unknown){const response=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const body=await response.json().catch(()=>({}));if(!response.ok) throw Object.assign(new Error(body?.error?.message ?? 'Falha ao consultar fonte.'),{status:response.status});return body;}
+export function awardPayload(input:SearchInput){return {origin:input.origin,destination:input.destination,startDate:input.departureDate,endDate:input.returnDate ?? input.departureDate,cabins:[input.cabin],onlyDirect:input.stops==='nonstop',take:20};}

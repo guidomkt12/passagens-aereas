@@ -1,0 +1,2 @@
+import { NextResponse } from 'next/server';
+export function GET(){return NextResponse.json({cashConfigured:Boolean(process.env.N8N_CASH_SEARCH_URL),dealsConfigured:Boolean(process.env.N8N_DEALS_URL),trendsConfigured:Boolean(process.env.N8N_TRENDS_URL),awardsConfigured:Boolean(process.env.N8N_AWARDS_URL),seatsAeroEnabled:process.env.SEATS_AERO_ENABLED==='true',browserFallbackEnabled:process.env.BROWSER_FALLBACK_ENABLED==='true'});}
