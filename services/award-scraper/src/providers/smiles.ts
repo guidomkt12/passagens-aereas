@@ -1,0 +1,2 @@
+import { genericSession, scrapeVisibleOffers, type Provider } from './base.js';
+export const smiles: Provider = { program: 'smiles', loginUrl: 'https://www.smiles.com.br/login', sessionValid: context => genericSession(context, 'https://www.smiles.com.br/login'), async search(context, input) { const page = context.pages()[0] ?? await context.newPage(); await page.goto(`https://www.smiles.com.br/miles/search?origin=${input.origin}&destination=${input.destination}&date=${input.departureDate}`, { waitUntil: 'domcontentloaded' }); return scrapeVisibleOffers(page, input); } };

@@ -1,0 +1,13 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { chromium, type BrowserContext, type Page } from 'playwright';
+
+export type Program = 'latam_pass' | 'smiles' | 'azul_fidelidade';
+export type Search = { origin: string; destination: string; departureDate: string; adults: number; cabin: string; program: Program };
+export type ScrapedOffer = { origin: string; destination: string; departureDate: string; cabin: string; points: number; taxes?: number; taxesCurrency?: string; seats?: number; direct?: boolean; airlines?: string[]; authenticatedPrice: true; accountSpecific: true; requiresRevalidation: false };
+export type Provider = { program: Program; loginUrl: string; search(context: BrowserContext, input: Search): Promise<ScrapedOffer[]>; sessionValid(context: BrowserContext): Promise<boolean> };
+const profiles = new Map<Program, BrowserContext>();
+export async function profile(program: Program) { let context = profiles.get(program); if (!context) { context = await chromium.launchPersistentContext(path.join(process.env.SCRAPER_PROFILE_DIR ?? '.profiles', program), { headless: process.env.SCRAPER_HEADLESS === 'true' }); profiles.set(program, context); } return context; }
+export async function errorArtifacts(program: Program, page: Page) { const dir = path.join(process.env.SCRAPER_ERROR_DIR ?? '.errors', program); await mkdir(dir, { recursive: true }); const stamp = new Date().toISOString().replace(/[:.]/g, '-'); await Promise.all([page.screenshot({ path: path.join(dir, `${stamp}.png`), fullPage: true }).catch(() => undefined), page.content().then(html => writeFile(path.join(dir, `${stamp}.html`), html)).catch(() => undefined)]); }
+export async function genericSession(context: BrowserContext, loginUrl: string) { const page = context.pages()[0] ?? await context.newPage(); if (!page.url().startsWith(loginUrl.split('/').slice(0, 3).join('/'))) await page.goto(loginUrl, { waitUntil: 'domcontentloaded' }); const text = (await page.locator('body').innerText().catch(() => '')).toLowerCase(); return !/entrar|login|sign in|acessar conta/.test(text) && !/captcha|verifique que você é humano|mfa|código de segurança/.test(text); }
+export async function scrapeVisibleOffers(page: Page, input: Search): Promise<ScrapedOffer[]> { const text = await page.locator('body').innerText(); const pointMatches = [...text.matchAll(/([\d.]+)\s*(?:pontos|milhas)/gi)]; return pointMatches.slice(0, 20).map(match => ({ origin: input.origin, destination: input.destination, departureDate: input.departureDate, cabin: input.cabin, points: Number(match[1].replace(/\./g, '')), taxesCurrency: 'BRL', authenticatedPrice: true, accountSpecific: true, requiresRevalidation: false })); }
