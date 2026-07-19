@@ -1,0 +1,1 @@
+import { proxyN8n } from '@/lib/n8n'; import { awardsSchema } from '@/lib/schemas'; export async function POST(r:Request){return proxyN8n(r,awardsSchema,'N8N_BROWSER_FALLBACK_URL',process.env.BROWSER_FALLBACK_ENABLED==='true');}
