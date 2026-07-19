@@ -1,0 +1,1 @@
+import { test, expect } from '@playwright/test'; test('protege painel e permite login',async({page})=>{await page.goto('/dashboard');await expect(page).toHaveURL(/login/);await page.getByLabel('Senha').fill('test');await page.getByRole('button',{name:'Entrar com segurança'}).click();await expect(page).toHaveURL(/dashboard/);});

@@ -1,0 +1,2 @@
+# Contratos n8n
+Cada webhook recebe JSON validado pelo handler e o header `x-flight-secret`. As respostas são consideradas opacas e retornadas em `data`; o cliente deve tratar campos ausentes como indisponíveis. Os contratos de resposta devem ser versionados nos workflows n8n antes de adicionar normalizadores específicos. Endpoints: busca dinheiro, promoções, tendências, milhas e fallback Brasil, configurados exclusivamente por variáveis de ambiente.
