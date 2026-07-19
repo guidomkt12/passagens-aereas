@@ -1,3 +1,0 @@
-import { NextRequest, NextResponse } from 'next/server'; import { cookie, validSession } from './src/lib/auth';
-export function middleware(req: NextRequest) { const { pathname }=req.nextUrl; if(pathname==='/login'||pathname.startsWith('/api/auth/login')||pathname.startsWith('/api/health')||pathname.startsWith('/_next')) return NextResponse.next(); if(validSession(req.cookies.get(cookie)?.value)) return NextResponse.next(); if(pathname.startsWith('/api/')) return NextResponse.json({error:{code:'UNAUTHORIZED',message:'Autenticação necessária.'}},{status:401}); return NextResponse.redirect(new URL('/login',req.url)); }
-export const config={matcher:['/((?!favicon.ico).*)']};
