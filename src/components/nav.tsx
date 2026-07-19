@@ -1,1 +1,1 @@
-import Link from 'next/link'; export function Nav(){return <nav style={{display:'flex',gap:14,flexWrap:'wrap',margin:'14px 0 28px'}}>{[['/dashboard','Painel'],['/buscar','Buscar'],['/resultados','Resultados'],['/promocoes','Promoções'],['/radares','Radares'],['/historico','Histórico'],['/configuracoes','Configurações']].map(([h,l])=><Link key={h} href={h} className="muted">{l}</Link>)}</nav>}
+export function Nav(){return null;}
