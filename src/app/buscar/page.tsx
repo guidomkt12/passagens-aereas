@@ -1,6 +1,8 @@
 'use client';
 
 import { Nav } from '@/components/nav';
+import { AirportAutocomplete } from '@/components/airport-autocomplete';
+import { airports, type AirportValue } from '@/data/airports';
 import { awardPayload, postFlight, storageKeys } from '@/lib/client-search';
 import type { SearchInput } from '@/lib/schemas';
 import { useState } from 'react';
@@ -12,6 +14,8 @@ function errorMessage(error: unknown) { const status = (error as { status?: numb
 
 export default function Buscar() {
   const [form, setForm] = useState<SearchInput>(initial);
+  const [origin, setOrigin] = useState<AirportValue | null>(airports.find(a => a.code === 'GRU') ?? null);
+  const [destination, setDestination] = useState<AirportValue | null>(airports.find(a => a.code === 'LIS') ?? null);
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState('');
   const [error, setError] = useState('');
@@ -21,7 +25,8 @@ export default function Buscar() {
     event.preventDefault();
     if (loading) return;
     setLoading(true); setError('');
-    const payload = { ...form, maxPrice: form.maxPrice || undefined };
+    if (!origin || !destination) { setError('Selecione um aeroporto ou uma cidade da lista.'); setLoading(false); return; }
+    const payload = { ...form, origin: origin.code, destination: destination.code, maxPrice: form.maxPrice || undefined };
     const errors: Record<string, string> = {};
     try {
       let cash: unknown; let awards: unknown;
@@ -46,7 +51,7 @@ export default function Buscar() {
   }
 
   return <main className="shell"><Nav /><h1>Planeje sua busca</h1><form className="card grid cols-2" onSubmit={submit}>
-    <label>Origem (IATA)<input className="input" value={form.origin} onChange={e => change('origin', e.target.value.toUpperCase())} required /></label><label>Destino (IATA)<input className="input" value={form.destination} onChange={e => change('destination', e.target.value.toUpperCase())} required /></label>
+    <AirportAutocomplete label="Origem" value={origin} onChange={setOrigin} required /><div className="route-destination"><AirportAutocomplete label="Destino" value={destination} onChange={setDestination} required /><button className="swap-airports" type="button" aria-label="Inverter origem e destino" onClick={()=>{setOrigin(destination);setDestination(origin)}}>⇄</button></div>
     <label>Ida<input className="input" type="date" value={form.departureDate} onChange={e => change('departureDate', e.target.value)} required /></label><label>Volta<input className="input" type="date" value={form.returnDate ?? ''} onChange={e => change('returnDate', e.target.value)} /></label>
     <label>Adultos<input className="input" type="number" min="1" max="9" value={form.adults} onChange={e => change('adults', Number(e.target.value))} /></label><label>Cabine<select className="input" value={form.cabin} onChange={e => change('cabin', e.target.value)}><option value="economy">Econômica</option><option value="premium_economy">Premium economy</option><option value="business">Executiva</option><option value="first">Primeira</option></select></label>
     <label>Escalas<select className="input" value={form.stops} onChange={e => change('stops', e.target.value)}><option value="any">Qualquer</option><option value="nonstop">Direto</option><option value="one_or_less">Até uma escala</option><option value="two_or_less">Até duas escalas</option></select></label><label>Preço máximo<input className="input" type="number" value={form.maxPrice ?? ''} onChange={e => change('maxPrice', Number(e.target.value))} /></label>
