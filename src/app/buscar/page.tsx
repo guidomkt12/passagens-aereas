@@ -42,7 +42,7 @@ export default function Buscar() {
         if (settled[1]?.status === 'fulfilled') awards = settled[1].value; else if (settled[1]?.status === 'rejected') errors.awards = errorMessage(settled[1].reason);
       }
       sessionStorage.setItem(storageKeys.search, JSON.stringify({ params: payload, at: new Date().toISOString() }));
-      if (cash) sessionStorage.setItem(storageKeys.cash, JSON.stringify(cash)); else sessionStorage.removeItem(storageKeys.cash);
+      if (cash) sessionStorage.setItem(storageKeys.cash, JSON.stringify({ savedAt: new Date().toISOString(), request: payload, response: cash })); else sessionStorage.removeItem(storageKeys.cash);
       if (awards) sessionStorage.setItem(storageKeys.award, JSON.stringify(awards)); else sessionStorage.removeItem(storageKeys.award);
       sessionStorage.setItem(storageKeys.errors, JSON.stringify(errors));
       if (!cash && !awards) throw new Error(Object.values(errors)[0] ?? 'Nenhuma fonte respondeu.');
